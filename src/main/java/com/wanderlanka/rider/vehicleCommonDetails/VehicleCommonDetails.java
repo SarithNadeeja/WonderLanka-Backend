@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(
-        name = "rider_personal_details",
+        name = "vehicle_common_details",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "user_id")
         }
@@ -21,20 +21,20 @@ public class VehicleCommonDetails {
     @JoinColumn(name = "user_id" ,nullable = false)
     private User user;
 
-    @Column(name = "Vehicle_type")
+    @Column(name = "vehicle_type")
     private String vehicleType;
 
-    @Column(name = "Vehicle_brand")
+    @Column(name = "vehicle_brand")
     private String vehicleBrand;
 
-    @Column(name = "Vehicle_model")
+    @Column(name = "vehicle_model")
     private String vehicleModel;
 
-    @Column(name = "Vehicle_Registration_no")
+    @Column(name = "vehicle_registration_no")
     private String regNo;
 
-    @Column(name = "Manufracture_year")
-    private int year;
+    @Column(name = "manufracture_year")
+    private Integer year;
 
 
     public Long getId(){
@@ -81,11 +81,11 @@ public class VehicleCommonDetails {
         this.regNo = regNo;
     }
 
-    public int getYear(){
+    public Integer getYear(){
         return year;
     }
 
-    public void setYear(int year){
+    public void setYear(Integer year){
         this.year = year;
     }
 
