@@ -27,13 +27,29 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                // ===== CORS =====
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // ===== CSRF =====
                 .csrf(csrf -> csrf.disable())
+
+                // ===== AUTHORIZATION =====
                 .authorizeHttpRequests(auth -> auth
+
+                        // auth endpoints
                         .requestMatchers("/api/auth/**").permitAll()
+
+                        // allow browser preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // allow serving uploaded images
+                        .requestMatchers("/uploads/**").permitAll()
+
+                        // everything else requires JWT
                         .anyRequest().authenticated()
                 )
+
+                // ===== JWT FILTER =====
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
@@ -42,18 +58,26 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // ===== PASSWORD ENCODER =====
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // ===== CORS CONFIG =====
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of("http://localhost:3000"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of(
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE",
+                "OPTIONS"
+        ));
         config.setAllowedHeaders(List.of(
                 "Authorization",
                 "Content-Type",
