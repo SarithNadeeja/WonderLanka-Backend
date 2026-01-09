@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface RiderProfilePictureRepository extends JpaRepository<RiderProfilePicture, Long> {
     Optional<RiderProfilePicture> findByUser(User user);
+    Optional<RiderProfilePicture> findByUserId(Long userId);
 }

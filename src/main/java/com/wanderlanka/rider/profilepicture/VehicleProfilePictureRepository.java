@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface VehicleProfilePictureRepository extends JpaRepository<VehicleProfilePicture, Long> {
     Optional<VehicleProfilePicture> findByUser(User user);
+    Optional<VehicleProfilePicture> findByUserId(Long userId);
 }
 

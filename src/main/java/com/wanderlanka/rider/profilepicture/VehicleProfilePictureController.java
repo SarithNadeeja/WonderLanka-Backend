@@ -94,4 +94,25 @@ public class VehicleProfilePictureController {
 
         return service.getImageUrl(userId);
     }
+
+    @DeleteMapping
+    public void deleteVehicleProfilePicture() {
+
+        Object principal = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        Long userId =
+                (principal instanceof Long l) ? l :
+                        (principal instanceof String s) ? Long.parseLong(s) :
+                                null;
+
+        if (userId == null) {
+            throw new RuntimeException("Invalid JWT principal");
+        }
+
+        service.delete(userId);
+    }
+
 }
