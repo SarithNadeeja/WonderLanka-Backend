@@ -8,12 +8,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @RestController
-@RequestMapping("/api/rider/profile-picture")
-public class ProfilePictureController {
+@RequestMapping("/api/rider/rider-profile-picture")
+public class RiderProfilePictureController {
 
-    private final ProfilePictureService service;
+    private final RiderProfilePictureService service;
 
-    public ProfilePictureController(ProfilePictureService service) {
+    public RiderProfilePictureController(RiderProfilePictureService service) {
         this.service = service;
     }
 

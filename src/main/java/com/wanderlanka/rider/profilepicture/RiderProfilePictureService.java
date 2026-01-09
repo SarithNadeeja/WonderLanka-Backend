@@ -5,11 +5,11 @@ import org.springframework.stereotype.Service;
 import com.wanderlanka.user.User;
 
 @Service
-public class ProfilePictureService {
+public class RiderProfilePictureService {
     private final RiderProfilePictureRepository repository;
     private final UserRepository userRepository;
 
-    public ProfilePictureService(
+    public RiderProfilePictureService(
             RiderProfilePictureRepository repository,
             UserRepository userRepository
     ) {
