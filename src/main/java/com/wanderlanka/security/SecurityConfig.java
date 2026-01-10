@@ -36,8 +36,9 @@ public class SecurityConfig {
                 // ===== AUTHORIZATION =====
                 .authorizeHttpRequests(auth -> auth
 
+
                         // auth endpoints
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**","/api/admin/dev/**","/api/admin/auth/**").permitAll()
 
                         // allow browser preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
