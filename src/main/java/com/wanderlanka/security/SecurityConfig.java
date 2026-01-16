@@ -40,6 +40,10 @@ public class SecurityConfig {
                         // auth endpoints
                         .requestMatchers("/api/auth/**","/api/admin/dev/**","/api/admin/auth/**").permitAll()
 
+                        .requestMatchers("/api/admin/license-verifications/**").permitAll()
+
+                        .requestMatchers("/api/license-verification/file/**").permitAll()
+
                         // allow browser preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 

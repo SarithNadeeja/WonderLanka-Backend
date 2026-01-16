@@ -29,6 +29,8 @@ public class LicenseVerification {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+
+
     // ==============================
     // JPA LIFECYCLE
     // ==============================
