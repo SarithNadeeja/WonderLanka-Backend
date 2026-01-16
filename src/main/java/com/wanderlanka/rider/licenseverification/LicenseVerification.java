@@ -11,7 +11,7 @@ public class LicenseVerification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false, unique = true)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
     @Enumerated(EnumType.STRING)
@@ -26,19 +26,21 @@ public class LicenseVerification {
 
     private LocalDateTime reviewedAt;
 
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
-
-
 
     // ==============================
     // JPA LIFECYCLE
     // ==============================
+
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        this.status = LicenseVerificationStatus.NOT_SUBMITTED;
+        // ❗ DO NOT set status here
     }
 
     @PreUpdate
@@ -49,64 +51,65 @@ public class LicenseVerification {
     // ==============================
     // GETTERS & SETTERS
     // ==============================
+
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
     public LicenseVerificationStatus getStatus() {
         return status;
-    }
-
-    public void setStatus(LicenseVerificationStatus status) {
-        this.status = status;
     }
 
     public String getRejectionReason() {
         return rejectionReason;
     }
 
-    public void setRejectionReason(String rejectionReason) {
-        this.rejectionReason = rejectionReason;
-    }
-
     public Long getReviewedByAdminId() {
         return reviewedByAdminId;
-    }
-
-    public void setReviewedByAdminId(Long reviewedByAdminId) {
-        this.reviewedByAdminId = reviewedByAdminId;
     }
 
     public LocalDateTime getReviewedAt() {
         return reviewedAt;
     }
 
-    public void setReviewedAt(LocalDateTime reviewedAt) {
-        this.reviewedAt = reviewedAt;
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public void setStatus(LicenseVerificationStatus status) {
+        this.status = status;
+    }
+
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
+    }
+
+    public void setReviewedByAdminId(Long reviewedByAdminId) {
+        this.reviewedByAdminId = reviewedByAdminId;
+    }
+
+    public void setReviewedAt(LocalDateTime reviewedAt) {
+        this.reviewedAt = reviewedAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public void setUpdatedAt(LocalDateTime updatedAt) {

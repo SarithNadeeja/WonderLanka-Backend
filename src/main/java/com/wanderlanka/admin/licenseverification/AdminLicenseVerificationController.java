@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.wanderlanka.rider.licenseverification.LicenseVerificationFile;
 
+import org.springframework.transaction.annotation.Transactional;
+
+
 @RestController
 @RequestMapping("/api/admin/license-verifications")
 public class AdminLicenseVerificationController {
@@ -63,5 +66,45 @@ public class AdminLicenseVerificationController {
                 })
                 .collect(Collectors.toList());
     }
+    @Transactional
+    @PutMapping("/{verificationId}/approve")
+    public void approveVerification(
+            @PathVariable Long verificationId,
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        LicenseVerification verification =
+                verificationRepository.findById(verificationId)
+                        .orElseThrow(() -> new RuntimeException("Verification not found"));
+
+        verification.setStatus(LicenseVerificationStatus.APPROVED);
+        verification.setReviewedAt(java.time.LocalDateTime.now());
+
+        // TODO: extract adminId from JWT later
+        verification.setReviewedByAdminId(1L);
+
+        verificationRepository.save(verification);
+    }
+    @Transactional
+    @PutMapping("/{verificationId}/reject")
+    public void rejectVerification(
+            @PathVariable Long verificationId,
+            @RequestBody RejectRequest request,
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        LicenseVerification verification =
+                verificationRepository.findById(verificationId)
+                        .orElseThrow(() -> new RuntimeException("Verification not found"));
+
+        verification.setStatus(LicenseVerificationStatus.REJECTED);
+        verification.setRejectionReason(request.getReason());
+        verification.setReviewedAt(java.time.LocalDateTime.now());
+
+        // TODO: extract adminId from JWT later
+        verification.setReviewedByAdminId(1L);
+
+        verificationRepository.save(verification);
+    }
+
+
 
 }

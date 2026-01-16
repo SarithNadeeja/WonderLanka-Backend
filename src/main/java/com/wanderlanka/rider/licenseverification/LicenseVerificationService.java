@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,37 +26,40 @@ public class LicenseVerificationService {
         this.fileRepository = fileRepository;
     }
 
+    /**
+     * Upload driving license images
+     * Each upload creates a NEW verification attempt
+     */
     public void uploadLicenseImages(
             Long userId,
             MultipartFile frontImage,
             MultipartFile backImage
     ) throws IOException {
 
-        // 1️⃣ Get or create verification record
-        LicenseVerification verification = verificationRepository
-                .findByUserId(userId)
-                .orElseGet(() -> {
-                    LicenseVerification v = new LicenseVerification();
-                    v.setUserId(userId);
-                    v.setStatus(LicenseVerificationStatus.NOT_SUBMITTED);
-                    return verificationRepository.save(v);
-                });
+        // 1️⃣ Always create a NEW verification attempt
+        LicenseVerification verification = new LicenseVerification();
+        verification.setUserId(userId);
+        verification.setStatus(LicenseVerificationStatus.PENDING);
+        verificationRepository.save(verification);
 
-        // 2️⃣ Create user folder
-        Path userFolder = Paths.get(
+        Long verificationId = verification.getId();
+
+        // 2️⃣ Create verification-specific folder
+        Path verificationFolder = Paths.get(
                 baseUploadPath,
                 "LicenseVerification",
-                "user-" + userId
+                "user-" + userId,
+                "verification-" + verificationId
         );
 
-        Files.createDirectories(userFolder);
+        Files.createDirectories(verificationFolder);
 
         // 3️⃣ Save front image
         saveFile(
                 verification,
                 frontImage,
                 LicenseFileSide.FRONT,
-                userFolder.resolve("front.jpg")
+                verificationFolder.resolve("front.jpg")
         );
 
         // 4️⃣ Save back image
@@ -65,14 +67,14 @@ public class LicenseVerificationService {
                 verification,
                 backImage,
                 LicenseFileSide.BACK,
-                userFolder.resolve("back.jpg")
+                verificationFolder.resolve("back.jpg")
         );
-
-        // 5️⃣ Update status → PENDING
-        verification.setStatus(LicenseVerificationStatus.PENDING);
-        verificationRepository.save(verification);
     }
 
+    /**
+     * Save a single license image
+     * Always creates a NEW DB row
+     */
     private void saveFile(
             LicenseVerification verification,
             MultipartFile multipartFile,
@@ -84,27 +86,15 @@ public class LicenseVerificationService {
             return;
         }
 
-        // Overwrite existing file
+        // Write file to disk
         Files.write(filePath, multipartFile.getBytes());
 
-        LicenseVerificationFile fileEntity = fileRepository
-                .findByVerificationAndFileSide(verification, side)
-                .orElseGet(() -> {
-                    LicenseVerificationFile f = new LicenseVerificationFile();
-                    f.setVerification(verification);
-                    f.setFileSide(side);
-                    return f;
-                });
-
+        // Create new file record (no overwrite)
+        LicenseVerificationFile fileEntity = new LicenseVerificationFile();
+        fileEntity.setVerification(verification);
+        fileEntity.setFileSide(side);
         fileEntity.setFilePath(filePath.toString());
+
         fileRepository.save(fileEntity);
     }
-
-    public String getLicenseStatus(Long userId) {
-        return verificationRepository
-                .findByUserId(userId)
-                .map(v -> v.getStatus().name())
-                .orElse("NOT_SUBMITTED");
-    }
-
 }

@@ -10,11 +10,20 @@ import org.springframework.web.multipart.MultipartFile;
 public class LicenseVerificationController {
 
     private final LicenseVerificationService service;
+    private final LicenseVerificationRepository verificationRepository;
 
-    public LicenseVerificationController(LicenseVerificationService service) {
+    public LicenseVerificationController(
+            LicenseVerificationService service,
+            LicenseVerificationRepository verificationRepository
+    ) {
         this.service = service;
+        this.verificationRepository = verificationRepository;
     }
 
+    /**
+     * Upload driving license images
+     * Always creates a NEW verification attempt
+     */
     @PostMapping("/upload")
     public ResponseEntity<?> uploadLicense(
             Authentication authentication,
@@ -22,7 +31,7 @@ public class LicenseVerificationController {
             @RequestParam("back") MultipartFile back
     ) {
         try {
-            // ⚠️ Adjust this based on how you store user ID in JWT
+            // ⚠️ Assumes authentication.getName() = userId
             Long userId = Long.parseLong(authentication.getName());
 
             service.uploadLicenseImages(userId, front, back);
@@ -36,14 +45,17 @@ public class LicenseVerificationController {
         }
     }
 
+    /**
+     * Get LATEST license verification status for rider
+     */
     @GetMapping("/status")
     public ResponseEntity<String> getLicenseStatus(Authentication authentication) {
 
         Long userId = Long.parseLong(authentication.getName());
 
-        String status = service.getLicenseStatus(userId);
-
-        return ResponseEntity.ok(status);
+        return verificationRepository
+                .findTopByUserIdOrderByCreatedAtDesc(userId)
+                .map(v -> ResponseEntity.ok(v.getStatus().name()))
+                .orElse(ResponseEntity.ok("NOT_SUBMITTED"));
     }
-
 }

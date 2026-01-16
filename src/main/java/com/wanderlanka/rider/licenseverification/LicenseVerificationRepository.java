@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface LicenseVerificationRepository extends JpaRepository<LicenseVerification, Long> {
     Optional<LicenseVerification> findByUserId(Long userId);
     List<LicenseVerification> findByStatus(LicenseVerificationStatus status);
+    Optional<LicenseVerification> findTopByUserIdOrderByCreatedAtDesc(Long userId);
 
 }
