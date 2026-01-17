@@ -2,6 +2,7 @@ package com.wanderlanka.rider.licenseverification;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -30,17 +31,24 @@ public class LicenseVerificationService {
      * Upload driving license images
      * Each upload creates a NEW verification attempt
      */
+    @Transactional
     public void uploadLicenseImages(
             Long userId,
             MultipartFile frontImage,
             MultipartFile backImage
     ) throws IOException {
 
-        // 1️⃣ Always create a NEW verification attempt
+        // 🔥 FIX: calculate attempt number
+        int nextAttempt =
+                verificationRepository.countByUserId(userId) + 1;
+
+        // 1️⃣ Create NEW verification attempt
         LicenseVerification verification = new LicenseVerification();
         verification.setUserId(userId);
+        verification.setAttemptNumber(nextAttempt);
         verification.setStatus(LicenseVerificationStatus.PENDING);
-        verificationRepository.save(verification);
+
+        verification = verificationRepository.save(verification);
 
         Long verificationId = verification.getId();
 
@@ -86,15 +94,23 @@ public class LicenseVerificationService {
             return;
         }
 
-        // Write file to disk
         Files.write(filePath, multipartFile.getBytes());
 
-        // Create new file record (no overwrite)
         LicenseVerificationFile fileEntity = new LicenseVerificationFile();
         fileEntity.setVerification(verification);
         fileEntity.setFileSide(side);
         fileEntity.setFilePath(filePath.toString());
 
         fileRepository.save(fileEntity);
+    }
+
+    /**
+     * Return the LATEST verification status for rider UI
+     */
+    public String getLicenseStatus(Long userId) {
+        return verificationRepository
+                .findTopByUserIdOrderByIdDesc(userId)
+                .map(v -> v.getStatus().name())
+                .orElse(LicenseVerificationStatus.NOT_SUBMITTED.name());
     }
 }

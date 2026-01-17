@@ -32,6 +32,10 @@ public class LicenseVerification {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "attempt_number", nullable = false)
+    private Integer attemptNumber;
+
+
     // ==============================
     // JPA LIFECYCLE
     // ==============================
@@ -40,7 +44,9 @@ public class LicenseVerification {
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        // ❗ DO NOT set status here
+        if (this.status == null) {
+            this.status = LicenseVerificationStatus.NOT_SUBMITTED;
+        }
     }
 
     @PreUpdate
@@ -115,4 +121,13 @@ public class LicenseVerification {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public Integer getAttemptNumber() {
+        return attemptNumber;
+    }
+
+    public void setAttemptNumber(Integer attemptNumber) {
+        this.attemptNumber = attemptNumber;
+    }
+
 }

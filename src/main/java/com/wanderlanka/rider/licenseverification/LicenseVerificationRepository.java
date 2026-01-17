@@ -10,4 +10,12 @@ public interface LicenseVerificationRepository extends JpaRepository<LicenseVeri
     List<LicenseVerification> findByStatus(LicenseVerificationStatus status);
     Optional<LicenseVerification> findTopByUserIdOrderByCreatedAtDesc(Long userId);
 
+    Optional<LicenseVerification>
+    findTopByUserIdOrderByAttemptNumberDesc(Long userId);
+
+    int countByUserId(Long userId);
+
+    Optional<LicenseVerification> findTopByUserIdOrderByIdDesc(Long userId);
+
+
 }
